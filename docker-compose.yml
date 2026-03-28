@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: buyer_portal_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: buyer_portal
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./server
+    container_name: buyer_portal_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    environment:
+      DB_NAME: buyer_portal
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      DB_HOST: postgres
+      JWT_SECRET: 51fbdffc5c7920747e146f9b81d00c7aa8438ad66ca18c428e2467d2815e01e1c43a6ddca9c437956bca02dc14c168a4253fbb5c6284cf6151e80bbc931f5502
+      PORT: 5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  postgres_data:
