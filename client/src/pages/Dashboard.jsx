@@ -41,6 +41,7 @@ export default function Dashboard() {
   const handleAdd = async () => {
     try {
       await API.post("/favourites/add", form);
+      alert("Property added to favourites!");
       fetchFavourites();
       setForm({
         propertyName: "",
@@ -56,6 +57,7 @@ export default function Dashboard() {
   };
 
   const handleRemove = async (id) => {
+    if (!window.confirm("Remove this property from favourites?")) return;
     try {
       await API.delete(`/favourites/remove/${id}`);
       fetchFavourites();
@@ -74,7 +76,11 @@ export default function Dashboard() {
       <div style={styles.header}>
         <div>
           <h2>Buyer Dashboard</h2>
-          {user && <p style={styles.sub}>Welcome, {user.name} · Role: Buyer</p>}
+          {user && (
+            <p style={styles.sub}>
+              Welcome, {user.name} · Role: {user.role}
+            </p>
+          )}
         </div>
         <button style={styles.logout} onClick={handleLogout}>
           Logout
