@@ -1,70 +1,91 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import API from "../api/axios";
 
 export default function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await API.post("/auth/signup", form);
-      alert("Registration Successful");
+      alert("Registration successful!");
+      navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration Has Been Failed");
+      alert(err.response?.data?.errors?.[0]?.message || "Registration failed");
     }
   };
+
   return (
-    <div
-      style={{
-        maxWidth: "400px",
-        margin: "50px auto",
-        padding: "20px",
-        border: "1px solid #ccc",
-      }}
-    >
-      <h2>Register</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2>Create Account</h2>
         <input
-          type="text"
+          style={styles.input}
           name="name"
-          placeholder="Name"
-          value={form.name}
+          placeholder="Full Name"
           onChange={handleChange}
-          required
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
         />
         <input
-          type="email"
+          style={styles.input}
           name="email"
           placeholder="Email"
-          value={form.email}
           onChange={handleChange}
-          required
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
         />
         <input
-          type="password"
+          style={styles.input}
           name="password"
           placeholder="Password"
-          value={form.password}
+          type="password"
           onChange={handleChange}
-          required
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
         />
-        <button type="submit" style={{ width: "100%", padding: "10px" }}>
+        <button style={styles.button} onClick={handleSubmit}>
           Register
         </button>
-      </form>
-      <p>
-        Already have an account? <a href="/login">Login</a>
-      </p>
+        <p>
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    background: "#f0f2f5",
+  },
+  card: {
+    background: "#fff",
+    padding: "2rem",
+    borderRadius: "8px",
+    width: "360px",
+    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  },
+  input: {
+    padding: "10px",
+    borderRadius: "6px",
+    border: "1px solid #ddd",
+    fontSize: "14px",
+  },
+  button: {
+    padding: "10px",
+    background: "#4f46e5",
+    color: "#fff",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "15px",
+  },
+};
